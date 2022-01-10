@@ -1,13 +1,14 @@
 import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selectors.withText;
+import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
 import static java.time.Duration.*;
 
@@ -19,14 +20,16 @@ public class CardOrderSelenideTest {
     }
 
     Calendar calendar = new GregorianCalendar();
-    String setDate = calendar.get(Calendar.DAY_OF_YEAR) + "." + calendar.get(Calendar.MONTH) + 1 + "." + calendar.get(Calendar.YEAR);
+    SimpleDateFormat dateFormat = new SimpleDateFormat( "dd.MM.yyyy" );
 
     @Test
     void shouldReturnSuccess() {
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
+        calendar.add(Calendar.DATE, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
-        $("[data-test-id='date'] input").setValue(setDate);
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $("[data-test-id='agreement'] .checkbox__box").click();
@@ -55,7 +58,9 @@ public class CardOrderSelenideTest {
         calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
-        $("[data-test-id='date'] input").setValue(setDate);
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
         $("[data-test-id='name'] input").setValue("");
         $(byText("Забронировать")).click();
         $("[data-test-id='name'] .input__sub").shouldHave(text("Поле обязательно для заполнения"));
@@ -66,7 +71,9 @@ public class CardOrderSelenideTest {
         calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
-        $("[data-test-id='date'] input").setValue(setDate);
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
         $("[data-test-id='name'] input").setValue("Ivan");
         $(byText("Забронировать")).click();
         $("[data-test-id='name'] .input__sub").shouldHave(text("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."));
@@ -77,7 +84,9 @@ public class CardOrderSelenideTest {
         calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
-        $("[data-test-id='date'] input").setValue(setDate);
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("");
         $(byText("Забронировать")).click();
@@ -89,7 +98,9 @@ public class CardOrderSelenideTest {
         calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
-        $("[data-test-id='date'] input").setValue(setDate);
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("8953");
         $(byText("Забронировать")).click();
@@ -101,7 +112,9 @@ public class CardOrderSelenideTest {
         calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
-        $("[data-test-id='date'] input").setValue(setDate);
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $(byText("Забронировать")).click();

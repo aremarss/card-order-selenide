@@ -1,7 +1,9 @@
 import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -20,7 +22,7 @@ public class CardOrderSelenideTest2 {
     }
 
     Calendar calendar = new GregorianCalendar();
-    String setDate = calendar.get(Calendar.DAY_OF_YEAR) + "." + calendar.get(Calendar.MONTH) + 1 + "." + calendar.get(Calendar.YEAR);
+    SimpleDateFormat dateFormat = new SimpleDateFormat( "dd.MM.yyyy" );
 
     @Test
     void shouldChooseCityFromList() {
@@ -28,7 +30,9 @@ public class CardOrderSelenideTest2 {
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Ка");
         $(".popup .menu").find(withText("Казань")).shouldHave(visible).click();
-        $("[data-test-id='date'] input").setValue(setDate);
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $("[data-test-id='agreement'] .checkbox__box").click();
