@@ -15,7 +15,7 @@ public class CardOrderSelenideTest {
 
     @BeforeAll
     static void setUp() {
-        Configuration.headless = false;
+        Configuration.headless = true;
     }
 
     Calendar calendar = new GregorianCalendar();
