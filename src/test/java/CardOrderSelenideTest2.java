@@ -19,7 +19,7 @@ public class CardOrderSelenideTest2 {
 
     @BeforeAll
     static void setUp() {
-        Configuration.headless = false;
+        Configuration.headless = true;
     }
 
     int days = 7; // На сколько дней вперед нужно сделать заказ.
