@@ -3,9 +3,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.*;
@@ -19,22 +18,24 @@ public class CardOrderSelenideTest {
         Configuration.headless = true;
     }
 
-    Calendar calendar = new GregorianCalendar();
-    SimpleDateFormat dateFormat = new SimpleDateFormat( "dd.MM.yyyy" );
+    String generateDate(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
+
+    String planningDate = generateDate(3);
 
     @Test
     void shouldReturnSuccess() {
-        calendar.add(Calendar.DATE, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
         $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
+        $("[data-test-id='date'] input").setValue(planningDate);
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $("[data-test-id='agreement'] .checkbox__box").click();
         $(byText("Забронировать")).click();
-        $(withText("Успешно!")).shouldBe(visible, ofSeconds(15));
+        $(".notification__content").shouldBe(visible, ofSeconds(15)).shouldHave(exactText("Встреча успешно забронирована на " + planningDate));
     }
 
     @Test
@@ -54,13 +55,33 @@ public class CardOrderSelenideTest {
     }
 
     @Test
-    void shouldReturnFailWithEmptyNames() {
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
+    void shouldReturnFailWithEmptyDate() {
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
         $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
+        $(byText("Забронировать")).click();
+        $("[data-test-id='date'] .input__sub").shouldHave(text("Неверно введена дата"));
+    }
+
+    @Test
+    void shouldReturnFailWithIncorrectDate() {
+        open("http://localhost:9999/");
+        $("[data-test-id='city'] input").setValue("Москва");
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(generateDate(0));
+        $(byText("Забронировать")).click();
+        $("[data-test-id='date'] .input__sub").shouldHave(text("Заказ на выбранную дату невозможен"));
+    }
+
+    @Test
+    void shouldReturnFailWithEmptyNames() {
+        open("http://localhost:9999/");
+        $("[data-test-id='city'] input").setValue("Москва");
+        $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
+        $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(planningDate);
         $("[data-test-id='name'] input").setValue("");
         $(byText("Забронировать")).click();
         $("[data-test-id='name'] .input__sub").shouldHave(text("Поле обязательно для заполнения"));
@@ -68,12 +89,11 @@ public class CardOrderSelenideTest {
 
     @Test
     void shouldReturnFailWithIncorrectNames() {
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
         $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
+        $("[data-test-id='date'] input").setValue(planningDate);
         $("[data-test-id='name'] input").setValue("Ivan");
         $(byText("Забронировать")).click();
         $("[data-test-id='name'] .input__sub").shouldHave(text("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."));
@@ -81,12 +101,11 @@ public class CardOrderSelenideTest {
 
     @Test
     void shouldReturnFailWithEmptyPhone() {
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
         $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
+        $("[data-test-id='date'] input").setValue(planningDate);
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("");
         $(byText("Забронировать")).click();
@@ -95,12 +114,11 @@ public class CardOrderSelenideTest {
 
     @Test
     void shouldReturnFailWithIncorrectPhone() {
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
         $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
+        $("[data-test-id='date'] input").setValue(planningDate);
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("8953");
         $(byText("Забронировать")).click();
@@ -109,12 +127,11 @@ public class CardOrderSelenideTest {
 
     @Test
     void shouldReturnFailWithEmptyCheckbox() {
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Москва");
         $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
+        $("[data-test-id='date'] input").setValue(planningDate);
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $(byText("Забронировать")).click();

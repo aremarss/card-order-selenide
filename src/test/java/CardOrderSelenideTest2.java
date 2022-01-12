@@ -3,10 +3,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 
+import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selectors.withText;
@@ -18,26 +19,36 @@ public class CardOrderSelenideTest2 {
 
     @BeforeAll
     static void setUp() {
-        Configuration.headless = true;
+        Configuration.headless = false;
     }
 
-    Calendar calendar = new GregorianCalendar();
-    SimpleDateFormat dateFormat = new SimpleDateFormat( "dd.MM.yyyy" );
+    int days = 7; // На сколько дней вперед нужно сделать заказ.
+
+    String planningDate(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
+
+    Month planningMonth(int days) {
+        return LocalDate.now().plusDays(days).getMonth();
+    }
+
+    String planningDay(int days) {
+        return String.valueOf(LocalDate.now().plusDays(days).getDayOfMonth());
+    }
 
     @Test
     void shouldChooseCityFromList() {
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
         open("http://localhost:9999/");
         $("[data-test-id='city'] input").setValue("Ка");
         $(".popup .menu").find(withText("Казань")).shouldHave(visible).click();
         $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(dateFormat.format(calendar.getTime()));
+        $("[data-test-id='date'] input").setValue(planningDate(days));
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $("[data-test-id='agreement'] .checkbox__box").click();
         $(byText("Забронировать")).click();
-        $(withText("Успешно!")).shouldBe(visible, ofSeconds(15));
+        $(".notification__content").shouldBe(visible, ofSeconds(15)).shouldHave(exactText("Встреча успешно забронирована на " + planningDate(days)));
     }
 
     @Test
@@ -46,12 +57,18 @@ public class CardOrderSelenideTest2 {
         $("[data-test-id='city'] input").setValue("Ка");
         $(".popup .menu").find(withText("Казань")).shouldHave(visible).click();
         $("[data-test-id='date'] .input__icon .icon-button").click();
-        int currentDate = Integer.parseInt($(".popup_visible .calendar__layout .calendar__day_state_current").getText());
-        $(".popup_visible .calendar__layout").find(byText(String.valueOf(currentDate + 7))).click();
+        for (int i = 0; i < 12; i++) {
+            if (planningMonth(days) != LocalDate.now().plusMonths(i).getMonth()) {
+                $("[data-step=\"1\"]").click();
+            } else if (planningMonth(days) == LocalDate.now().plusMonths(i).getMonth()) {
+                $(".popup_visible .calendar__layout").find(withText(planningDay(days))).click();
+                break;
+            }
+        }
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $("[data-test-id='agreement'] .checkbox__box").click();
         $(byText("Забронировать")).click();
-        $(withText("Успешно!")).shouldBe(visible, ofSeconds(15));
+        $(".notification__content").shouldBe(visible, ofSeconds(15)).shouldHave(exactText("Встреча успешно забронирована на " + planningDate(days)));
     }
 }
