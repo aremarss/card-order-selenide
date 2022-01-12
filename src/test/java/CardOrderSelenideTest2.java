@@ -24,15 +24,15 @@ public class CardOrderSelenideTest2 {
 
     int days = 7; // На сколько дней вперед нужно сделать заказ.
 
-    String planningDate(int days) {
+    String planningDate() {
         return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
-    Month planningMonth(int days) {
+    Month planningMonth() {
         return LocalDate.now().plusDays(days).getMonth();
     }
 
-    String planningDay(int days) {
+    String planningDay() {
         return String.valueOf(LocalDate.now().plusDays(days).getDayOfMonth());
     }
 
@@ -43,12 +43,12 @@ public class CardOrderSelenideTest2 {
         $(".popup .menu").find(withText("Казань")).shouldHave(visible).click();
         $("[data-test-id='date'] input").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id='date'] input").sendKeys(Keys.BACK_SPACE);
-        $("[data-test-id='date'] input").setValue(planningDate(days));
+        $("[data-test-id='date'] input").setValue(planningDate());
         $("[data-test-id='name'] input").setValue("Иван Иванов");
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $("[data-test-id='agreement'] .checkbox__box").click();
         $(byText("Забронировать")).click();
-        $(".notification__content").shouldBe(visible, ofSeconds(15)).shouldHave(exactText("Встреча успешно забронирована на " + planningDate(days)));
+        $(".notification__content").shouldBe(visible, ofSeconds(15)).shouldHave(exactText("Встреча успешно забронирована на " + planningDate()));
     }
 
     @Test
@@ -58,10 +58,10 @@ public class CardOrderSelenideTest2 {
         $(".popup .menu").find(withText("Казань")).shouldHave(visible).click();
         $("[data-test-id='date'] .input__icon .icon-button").click();
         for (int i = 0; i < 12; i++) {
-            if (planningMonth(days) != LocalDate.now().plusMonths(i).getMonth()) {
+            if (planningMonth() != LocalDate.now().plusMonths(i).getMonth()) {
                 $("[data-step=\"1\"]").click();
-            } else if (planningMonth(days) == LocalDate.now().plusMonths(i).getMonth()) {
-                $(".popup_visible .calendar__layout").find(withText(planningDay(days))).click();
+            } else if (planningMonth() == LocalDate.now().plusMonths(i).getMonth()) {
+                $(".popup_visible .calendar__layout").find(withText(planningDay())).click();
                 break;
             }
         }
@@ -69,6 +69,6 @@ public class CardOrderSelenideTest2 {
         $("[data-test-id='phone'] input").setValue("+79003332211");
         $("[data-test-id='agreement'] .checkbox__box").click();
         $(byText("Забронировать")).click();
-        $(".notification__content").shouldBe(visible, ofSeconds(15)).shouldHave(exactText("Встреча успешно забронирована на " + planningDate(days)));
+        $(".notification__content").shouldBe(visible, ofSeconds(15)).shouldHave(exactText("Встреча успешно забронирована на " + planningDate()));
     }
 }
